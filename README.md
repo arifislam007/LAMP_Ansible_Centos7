@@ -6,7 +6,9 @@ In you ansible Host file locatted /etc/ansible/hosts or you can configure your c
 Ansible Inventory Configuration:
 
 [web] for web server configuration. you just configure your server ip under this group for web configuration.
+
 [ha] for HAProxy confguraiton group name. you just place your HAProxy server ip under this group.
+
 [db] for Database group name. place you DB server ip under this group.
 
 Change in sample code:
