@@ -1,5 +1,6 @@
 # LAMP_Ansible_Centos7
 Note: Don't change any directory Name. and clone this project to your root directory.
+This repository is only for practice purpose.
 
 This repository will work on centos 7 for LAMP Stack (Apache, PHP8.1, Mariadb)
 This is a php base web application backed with mysql Database.
