@@ -3,7 +3,7 @@
   tasks:
     - name: Installing Python mysqld Package
       yum:
-        name: python-PyMySQL
+        name: python3-PyMySQL
         state: present
     - name: Installing Maria DB Package
       yum:

@@ -30,7 +30,7 @@
     
     - name: add sample file to db
       copy:
-        src: /root/LAMP_Ansible_Centos7/cfg/dump.sql
+        src: /root/pagecloud/cfg/dump.sql
         dest: /tmp/dump.sql
     - name: insert sample data to database
       mysql_db:

@@ -5,6 +5,10 @@
       yum:
         name: haproxy
         state: latest
+    - name: Remove Default HAProxy Configure file
+      file:
+        path: /etc/haproxy/haproxy.cfg
+        state: absent
     - name: Copy HAProxy Configure File
       copy:
         src: /root/LAMP_Ansible_Centos7/cfg/haproxy.cfg
