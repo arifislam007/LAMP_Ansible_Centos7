@@ -12,11 +12,15 @@ Ansible Inventory Configuration:
 [db] for Database group name. place you DB server ip under this group.
 
 Change in sample code:
+
 In config.php file replace your database ip address here. File location: code/config.php
+
 In HAProxy configuration file just change your webserver ip address. File location: cfg/haproxy.cfg
 
 
+
 All done now just run yml file as per secquence. 
+
 1. repository_installation.yml
 2. apache-with-php.yml
 3. mariadb-installation.yml
