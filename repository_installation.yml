@@ -1,0 +1,21 @@
+- name: Install Epel Repository
+  hosts: all
+  tasks:
+    - name: Install Extra Repository
+      yum:
+        name: epel-release
+        state: latest
+    - name: Download repo file
+      get_url:
+        url: https://rpms.remirepo.net/enterprise/remi-release-7.rpm
+        dest: /tmp/remi-release-7.rpm
+        mode: '0440'
+    - name: install php repo 
+      yum:
+        name: /tmp/remi-release-7.rpm
+        state: present
+    - name: Disable Selinux First
+      selinux:
+        policy: targeted
+        state: disabled
+        

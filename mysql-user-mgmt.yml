@@ -1,0 +1,41 @@
+- name: Check and set root password
+  hosts: db
+  tasks:
+    - name: check root password is unset
+      mysql_user:
+        login_host: 'localhost'
+        login_user: 'root'
+        login_password: ''
+        name: ''
+        state: absent
+    - name: Create database user with name admin and password 'admin123' with all database privileges
+      mysql_user:
+        name: 'admin'
+        password: 'admin123'
+        priv: '*.*:ALL'
+        host: '%%'
+        state: present
+        
+    - name: Open firewall port for mysql 
+      firewalld:
+        port: 3306/tcp
+        state: enabled
+        
+    - name: create database
+      mysql_db:
+        login_user: 'admin'
+        login_password: 'admin123'
+        name: demo
+        state: present
+    
+    - name: add sample file to db
+      copy:
+        src: /root/pagecloud/cfg/dump.sql
+        dest: /tmp/dump.sql
+    - name: insert sample data to database
+      mysql_db:
+        name: demo
+        state: import
+        target: /tmp/dump.sql
+        login_user: 'admin'
+        login_password: 'admin123'
