@@ -1,6 +1,4 @@
 # LAMP_Ansible_Centos7
-Note: Don't change any directory Name. and clone this project to your root directory.
-
 This repository will work on centos 7 for LAMP Stack (Apache, PHP8.1, Mariadb)
 This is a php base web application backed with mysql Database.
 In you ansible Host file locatted /etc/ansible/hosts or you can configure your custome inventory file for this stack. In your invantory file server group name should be as following:
