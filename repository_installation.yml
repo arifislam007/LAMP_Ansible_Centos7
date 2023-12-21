@@ -10,6 +10,7 @@
         url: https://rpms.remirepo.net/enterprise/remi-release-7.rpm
         dest: /tmp/remi-release-7.rpm
         mode: '0440'
+        validate_certs: no
     - name: install php repo 
       yum:
         name: /tmp/remi-release-7.rpm
