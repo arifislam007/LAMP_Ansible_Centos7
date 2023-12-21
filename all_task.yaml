@@ -1,0 +1,125 @@
+- name: Install Epel Repository
+  hosts: app
+  tasks:
+    - name: Install Extra Repository
+      yum:
+        name: epel-release
+        state: latest
+    - name: Download repo file
+      get_url:
+        url: https://rpms.remirepo.net/enterprise/remi-release-7.rpm
+        dest: /tmp/remi-release-7.rpm
+        mode: '0440'
+        validate_certs: no
+    - name: install php repo
+      yum:
+        name: /tmp/remi-release-7.rpm
+        state: present
+    - name: Disable Selinux First
+      selinux:
+        policy: targeted
+        state: disabled
+- name: Install Apache On Centos 7
+  hosts: app-web
+  tasks:
+    - name: Installing PHP packages
+      yum:
+        name: ['php', 'php-fpm', 'php-cli', 'php-curl', 'php-mysqlnd', 'php-zip', 'php-mbstring', 'php-devel']
+        state: present
+        enablerepo: remi-php81
+    - name: Apache web installaion package started
+      yum:
+        name: httpd
+        state: latest
+    - name: copying file controller to target host
+      copy:
+        src: ./code
+        dest: /var/www/html
+        owner: apache
+        group: root
+        mode: 0755
+    - name: copy index file to web host
+      copy:
+        src: ./cfg/index.html
+        dest: /var/www/html
+        owner: apache
+        group: root
+        mode: 0755
+    - name: Restart apache service
+      service:
+        name: httpd
+        state: restarted
+    - name: Apache service enabled
+      service:
+        name: httpd
+        enabled: yes
+    - name: Open firewall port for apache
+      firewalld:
+        port: 80/tcp
+        state: enabled
+    - name: start apache service again for ensure
+      service:
+        name: httpd
+        state: restarted
+
+- name: Install mariadb server on Target
+  hosts: app-db
+  tasks:
+    - name: Installing Python mysqld Package
+      yum:
+        name: python-PyMySQL
+        state: present
+    - name: Installing Maria DB Package
+      yum:
+        name: mariadb-server
+        state: present
+    - name: Starting DB Service
+      service:
+        name: mariadb
+        state: started
+        enabled: yes
+    - name: Mysql Client Installing
+      yum:
+        name: mysql
+        state: present
+- name: Check and set root password
+  hosts: app-db
+  tasks:
+    - name: check root password is unset
+      mysql_user:
+        login_host: 'localhost'
+        login_user: 'root'
+        login_password: ''
+        name: ''
+        state: absent
+    - name: Create database user with name admin and password 'admin123' with all database privileges
+      mysql_user:
+        name: 'admin'
+        password: 'admin123'
+        priv: '*.*:ALL'
+        host: '%%'
+        state: present
+
+    - name: Open firewall port for mysql
+      firewalld:
+        port: 3306/tcp
+        state: enabled
+
+    - name: create database
+      mysql_db:
+        login_user: 'admin'
+        login_password: 'admin123'
+        name: demo
+        state: present
+
+    - name: add sample file to db
+      copy:
+        src: ./cfg/dump.sql
+        dest: /tmp/dump.sql
+    - name: insert sample data to database
+      mysql_db:
+        name: demo
+        state: import
+        target: /tmp/dump.sql
+        login_user: 'admin'
+        login_password: 'admin123'
