@@ -22,7 +22,7 @@ In HAProxy configuration file just change your webserver ip address. File locati
 
 
 
-All done now just run yml file as per secquence. 
+All done now just run yml file as per secquence or you can run all_task.yaml
 
 1. repository_installation.yml
 2. apache-with-php.yml
