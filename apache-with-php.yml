@@ -12,14 +12,14 @@
         state: latest
     - name: copying file controller to target host
       copy:
-        src: /root/LAMP_Ansible_Centos7/code
+        src: ./code
         dest: /var/www/html
         owner: apache
         group: root
         mode: 0755
     - name: copy index file to web host
       copy:
-        src: /root/LAMP_Ansible_Centos7/cfg/index.html
+        src: ./cfg/index.html
         dest: /var/www/html
         owner: apache
         group: root
