@@ -1,0 +1,150 @@
+- name: Install Epel Repository
+  hosts: db01
+  become: true
+  tasks:
+    - name: Ensure system is up-to-date
+      dnf:
+        name: "*"
+        state: latest
+        update_cache: yes
+
+    - name: Install EPEL repository
+      dnf:
+        name: epel-release
+        state: present
+
+    - name: Install Remi repository
+      dnf:
+        name: https://rpms.remirepo.net/enterprise/remi-release-9.rpm
+        state: present
+
+    - name: Reset PHP module
+      command: dnf module reset php -y
+
+    - name: Enable Remi repository for PHP 8.0
+      command: dnf module enable php:remi-8.0 -y
+
+    - name: Install PHP and common extensions
+      dnf:
+        name:
+          - php
+          - php-cli
+          - php-fpm
+          - php-mysqlnd
+          - php-zip
+          - php-gd
+          - php-mbstring
+          - php-curl
+          - php-xml
+          - php-pear
+          - php-bcmath
+          - php-json
+        state: present
+
+    - name: Disable Selinux First
+      selinux:
+        policy: targeted
+        state: disabled
+
+    - name: Apache web installation package started
+      yum:
+        name: httpd
+        state: latest
+
+    - name: Copying file from controller to target host
+      copy:
+        src: ./code
+        dest: /var/www/html
+        owner: apache
+        group: root
+        mode: 0755
+
+    - name: Copy index file to web host
+      copy:
+        src: ./cfg/index.html
+        dest: /var/www/html
+        owner: apache
+        group: root
+        mode: 0755
+
+    - name: Restart Apache service
+      service:
+        name: httpd
+        state: restarted
+
+    - name: Enable Apache service
+      service:
+        name: httpd
+        enabled: yes
+
+    - name: Open firewall port for Apache
+      firewalld:
+        port: 80/tcp
+        state: enabled
+
+    - name: Start Apache service again to ensure
+      service:
+        name: httpd
+        state: restarted
+
+    - name: Installing Python MySQL package
+      yum:
+        name: python-PyMySQL
+        state: present
+
+    - name: Installing MariaDB package
+      yum:
+        name: mariadb-server
+        state: present
+
+    - name: Starting MariaDB service
+      service:
+        name: mariadb
+        state: started
+        enabled: yes
+
+    - name: Installing MySQL client
+      yum:
+        name: mysql
+        state: present
+
+    - name: Check if root password is unset
+      mysql_user:
+        login_host: 'localhost'
+        login_user: 'root'
+        login_password: ''
+        name: ''
+        state: absent
+
+    - name: Create database user with name admin and password 'admin123' with all database privileges
+      mysql_user:
+        name: 'admin'
+        password: 'admin123'
+        priv: '*.*:ALL'
+        host: '%%'
+        state: present
+
+    - name: Open firewall port for MySQL
+      firewalld:
+        port: 3306/tcp
+        state: enabled
+
+    - name: Create database
+      mysql_db:
+        login_user: 'admin'
+        login_password: 'admin123'
+        name: demo
+        state: present
+
+    - name: Add sample file to DB
+      copy:
+        src: ./cfg/dump.sql
+        dest: /tmp/dump.sql
+
+    - name: Insert sample data to database
+      mysql_db:
+        name: demo
+        state: import
+        target: /tmp/dump.sql
+        login_user: 'admin'
+        login_password: 'admin123'
